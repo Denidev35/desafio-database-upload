@@ -31,20 +31,21 @@ class CreateTransactionService {
     const transactionRepository = getCustomRepository(TransactionRepository);
     const categoryRepository = getRepository(Category);
 
-    if (
-      !(await categoryRepository.findOne({
-        where: { title: category },
-      }))
-    ) {
+    const categoryTitle = await categoryRepository.findOne({
+      where: { title: category },
+    });
+
+    let categoryID = '';
+
+    if (!categoryTitle) {
       const categoryTab = categoryRepository.create({
         title: category,
       });
       await categoryRepository.save(categoryTab);
+      categoryID = categoryTab.id;
+    } else {
+      categoryID = categoryTitle.id;
     }
-
-    const categoryTitle = await categoryRepository.findOne({
-      where: { title: category },
-    });
 
     const { total } = await transactionRepository.getBalance();
 
@@ -56,7 +57,7 @@ class CreateTransactionService {
       title,
       value,
       type,
-      category_id: categoryTitle?.id,
+      category_id: categoryID,
     });
 
     await transactionRepository.save(transaction);
