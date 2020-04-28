@@ -56,9 +56,7 @@ transactionsRouter.post(
   async (request, response) => {
     const importTransaction = new ImportTransactionsService();
 
-    const transaction = await importTransaction.execute({
-      transactionFilename: request.file.filename,
-    });
+    const transaction = await importTransaction.execute(request.file.path);
 
     response.json(transaction);
   },
